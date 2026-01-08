@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE UNLEARN | विस्मृति</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="assets/f.ico">
+    
+    <!-- Premium Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Noto+Serif+Devanagari:wght@100;400;700&family=Inter:wght@200;400;700&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+    
+    <!-- GSAP for Professional Motion -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        :root {
+            --bg: #020202;
+            --accent-saffron: #FF9933;
+            --text-main: #e5e5e5;
+            --devanagari-ghost: rgba(255, 255, 255, 0.03);
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* --- Cinematic Layering --- */
+        .vignette {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, transparent 20%, rgba(0,0,0,0.95) 100%);
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        @keyframes grain-flicker {
+            0% { transform: translate(0,0); }
+            10% { transform: translate(-1%,-1%); }
+            20% { transform: translate(1%,1%); }
+            30% { transform: translate(-2%,1%); }
+            40% { transform: translate(1%,-2%); }
+            50% { transform: translate(-1%,1%); }
+            60% { transform: translate(2%,2%); }
+            70% { transform: translate(1%,1%); }
+            80% { transform: translate(-1%,-1%); }
+            90% { transform: translate(1%,-1%); }
+            100% { transform: translate(0,0); }
+        }
+
+        .film-grain {
+            position: fixed;
+            top: -100%; left: -100%; width: 300%; height: 300%;
+            background: url('https://www.transparenttextures.com/patterns/black-paper.png');
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 40;
+            animation: grain-flicker 0.2s steps(1) infinite;
+        }
+
+        .mist {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.02), transparent);
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* --- Typography & Motifs --- */
+        .display-font { font-family: 'Cinzel', serif; letter-spacing: -0.02em; }
+        .hindi-font { font-family: 'Noto Serif Devanagari', serif; font-weight: 100; }
+        .body-font { font-family: 'Lora', serif; line-height: 2; }
+
+        .shirorekha {
+            position: relative;
+            display: inline-block;
+        }
+        .shirorekha::after {
+            content: "";
+            position: absolute;
+            top: 25%;
+            left: -10%;
+            width: 120%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, currentColor, transparent);
+            opacity: 0.4;
+        }
+
+        .devanagari-spine {
+            font-family: 'Noto Serif Devanagari', serif;
+            position: fixed;
+            right: 3%;
+            top: 0;
+            font-size: 18vh;
+            line-height: 1;
+            writing-mode: vertical-rl;
+            color: var(--devanagari-ghost);
+            pointer-events: none;
+            z-index: 1;
+            font-weight: 100;
+            white-space: nowrap;
+        }
+
+        /* --- Sections --- */
+        .chapter-container {
+            min-height: 110vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 15vh 12%;
+            position: relative;
+            z-index: 20;
+        }
+
+        .text-reveal {
+            opacity: 0;
+            filter: blur(20px);
+            transform: translateY(60px);
+        }
+
+        .punchline {
+            font-size: 0.65rem;
+            letter-spacing: 0.7em;
+            text-transform: uppercase;
+            color: #444;
+            margin-bottom: 2.5rem;
+            display: block;
+            font-weight: 900;
+            position: relative;
+        }
+
+        /* Hero Light Leak Effect */
+        .hero-title {
+            background: linear-gradient(110deg, #fff 40%, #555 50%, #fff 60%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: light-leak 6s linear infinite;
+        }
+
+        @keyframes light-leak {
+            to { background-position: 200% center; }
+        }
+
+        @media (max-width: 768px) {
+            .chapter-container { padding: 12vh 8%; }
+            .devanagari-spine { font-size: 12vh; right: 0; opacity: 0.2; }
+        }
+    </style>
+</head>
+<body class="selection:bg-white selection:text-black">
+
+    <div class="vignette"></div>
+    <div class="film-grain"></div>
+    <div class="mist" id="mistLayer"></div>
+    
+    <div class="devanagari-spine" id="spine">
+        विस्मृति • योधा • जिज्ञासा • विनाश • मौन • सत्य • मुक्ति
+    </div>
+
+    <!-- Intro Header -->
+    <header class="h-screen flex flex-col items-center justify-center text-center px-6 relative">
+        <div class="text-reveal active-initial">
+            <span class="hindi-font text-5xl mb-6 block opacity-20 tracking-widest">विस्मृति</span>
+            <h1 class="display-font text-6xl md:text-[11vw] font-black mb-4 shirorekha hero-title">THE <br> UNLEARN</h1>
+            <div class="mt-12 overflow-hidden h-8">
+                <p class="text-[9px] uppercase tracking-[1.2em] text-zinc-600 animate-slide-up">A Story of Everyman</p>
+            </div>
+        </div>
+        <div class="absolute bottom-12 flex flex-col items-center gap-4 opacity-20">
+            <div class="w-px h-16 bg-white animate-pulse"></div>
+            <span class="text-[8px] uppercase tracking-widest">Scroll to witness</span>
+        </div>
+    </header>
+
+    <!-- Chapter 1 -->
+    <section class="chapter-container">
+        <div class="max-w-4xl text-reveal">
+            <span class="punchline">I. THE PRIDE OF THE MOB</span>
+            <h2 class="display-font text-5xl md:text-8xl mb-12 text-[#FF9933] shirorekha">The Warrior</h2>
+            <div class="body-font text-zinc-400 text-lg md:text-xl space-y-10">
+                <p>Arjun wasn’t a bad person; he was a person who wanted to <span class="text-white">feel important.</span></p>
+                <p>He grew up in a world where everyone told him that his religion was under attack. As a young man, this gave him a huge sense of purpose. He didn't just pray; he "defended." He wore a saffron scarf like a soldier’s uniform.</p>
+                <div class="relative py-12">
+                    <p class="text-white italic text-3xl md:text-4xl leading-snug font-light">
+                        "Our ancestors were scientists and warriors while the rest of the world lived in caves."
+                    </p>
+                    <div class="absolute top-0 left-0 w-1 h-full bg-[#FF9933] opacity-30"></div>
+                </div>
+                <p>His life was simple. If you were with him, you were a brother. If you questioned him, you were a traitor. He loved the loud chants, the smell of heavy incense, and the feeling of belonging to a massive, powerful group.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chapter 2 -->
+    <section class="chapter-container bg-neutral-900/10">
+        <div class="max-w-4xl ml-auto text-right text-reveal">
+            <span class="punchline">II. A QUESTION FOR A WEAK GOD</span>
+            <h2 class="display-font text-5xl md:text-8xl mb-12 shirorekha">The Sister</h2>
+            <div class="body-font text-zinc-400 text-lg space-y-10">
+                <p>Arjun had a younger sister named Meera. She was his favorite person in the world. She was smart, quiet, and loved science.</p>
+                <p class="text-white text-3xl md:text-5xl font-light italic leading-tight">"If God created the whole universe... why is He so easily insulted by a movie? Is He that weak?"</p>
+                <p class="max-w-xl ml-auto text-zinc-500">Arjun got angry. "It’s about respect, Meera! You’ve been brainwashed by your college teachers."</p>
+                <p>But that night, her question echoed: Why would an infinite creator need a twenty-three-year-old with a stick to defend him?</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chapter 3 -->
+    <section class="chapter-container">
+        <div class="max-w-4xl text-reveal">
+            <span class="punchline">III. BLOOD AGAINST MANTRA</span>
+            <h2 class="display-font text-5xl md:text-8xl mb-12 text-[#FF9933] shirorekha">The Breakdown</h2>
+            <div class="body-font text-zinc-400 text-lg space-y-10">
+                <p>Everything changed when Meera got sick. The doctors called it "Acute Leukemia." Arjun's first instinct wasn't to talk to the doctors; it was to talk to God.</p>
+                <p>He fasting for days. He even met a famous "Baba" who promised a cure if Arjun donated money and followed a ritual.</p>
+                <p class="text-white font-bold py-12 text-3xl md:text-4xl italic border-y border-white/5 my-12 text-center">"Do not trust the hospital too much. Trust the divine."</p>
+                <p>Arjun believed him. He actually told the doctors to slow down the treatment because he was waiting for the "divine miracle" to kick in.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chapter 4 -->
+    <section class="chapter-container bg-white text-black overflow-hidden">
+        <div class="max-w-5xl mx-auto text-center text-reveal">
+            <span class="punchline !text-zinc-400 mb-16">IV. BIOLOGY DEFEATS DOGMA</span>
+            <h2 class="display-font text-6xl md:text-9xl mb-16 font-black shirorekha">The Silence</h2>
+            <div class="body-font text-zinc-800 text-xl md:text-2xl space-y-12 max-w-3xl mx-auto">
+                <p class="text-4xl md:text-6xl font-light italic leading-tight text-black">"Stop the rituals. It’s okay to let go. The world is just... biological."</p>
+                <p>She died two hours later. Arjun waited for the Baba’s promise to come true. He waited for the vibrations. Nothing happened. The room stayed silent.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chapter 5 -->
+    <section class="chapter-container">
+        <div class="max-w-4xl text-reveal">
+            <span class="punchline">V. THE SCAM OF DIVINE WILL</span>
+            <h2 class="display-font text-5xl md:text-8xl mb-12 shirorekha">The Truth</h2>
+            <div class="body-font text-zinc-400 text-lg space-y-10">
+                <p>"Your faith must have been weak," the Baba said. In that moment, something inside Arjun snapped. He realized that "God’s will" was just a cover-up for the fact that the Baba had no power at all.</p>
+                <p>He realized that the wall of posters and idols were just <span class="text-white font-bold">paper and stone.</span> They hadn't saved Meera. Medicine might have, but he waste time on magic.</p>
+                <div class="h-px w-full bg-white/10 mt-20"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chapter 6 -->
+    <section class="chapter-container">
+        <div class="max-w-4xl ml-auto text-reveal">
+            <span class="punchline">VI. TRAITOR TO THE DELUSION</span>
+            <h2 class="display-font text-5xl md:text-8xl mb-12 shirorekha">The Light</h2>
+            <div class="body-font text-zinc-400 text-lg space-y-10">
+                <p>Being an atheist isn't easy when you've spent your whole life being a "warrior." His old friends called him a "loser" and a "traitor."</p>
+                <p class="text-4xl text-white font-light italic leading-snug py-16 border-r-2 border-white/10 pr-12 text-right">"I'm just looking at the world with my own eyes now, not through a saffron filter."</p>
+                <p class="text-zinc-500">He read about biology, Earth, and history. He realized that the world was much bigger and more beautiful than he ever imagined. He didn't need a scripture to tell him to be a good person.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chapter 7 -->
+    <section class="chapter-container">
+        <div class="max-w-4xl text-reveal text-center mx-auto">
+            <span class="punchline">VII. NO GODS, ONLY US</span>
+            <h2 class="display-font text-6xl md:text-[13vw] mb-12 text-white shirorekha">HUMAN</h2>
+            <div class="body-font text-zinc-400 text-lg md:text-2xl space-y-16">
+                <p>He doesn't wear a saffron scarf anymore. He wears a simple shirt. He doesn't spend his mornings in a temple; he spends them watching the birds in the park.</p>
+                <p class="text-white text-4xl md:text-6xl font-light italic leading-tight">"I don't have to defend a God anymore. I just have to be a decent human being."</p>
+                <div class="pt-20">
+                    <p class="text-[9px] uppercase tracking-[1em] text-zinc-800">For Arjun, that was finally enough.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-32 text-center border-t border-zinc-900 bg-black relative z-50">
+        <div class="hindi-font text-4xl mb-6 opacity-10 tracking-[0.3em]">तर्क ही सत्य है</div>
+        <div class="flex flex-col gap-2 items-center">
+            <p class="text-[10px] uppercase tracking-[0.8em] text-zinc-800">The Unlearn • A Cinematic Essay</p>
+            <p class="text-[8px] uppercase tracking-[0.4em] text-zinc-900 mt-4">Varanasi • MMXXVI</p>
+        </div>
+    </footer>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Pre-init
+        gsap.set(".text-reveal", { opacity: 0, filter: "blur(20px)", y: 60 });
+        gsap.set(".active-initial", { opacity: 1, filter: "blur(0px)", y: 0 });
+
+        // Devanagari Spine Parallax
+        gsap.to("#spine", {
+            yPercent: -45,
+            ease: "none",
+            scrollTrigger: {
+                trigger: "body",
+                start: "top top",
+                end: "bottom bottom",
+                scrub: 1.5
+            }
+        });
+
+        // Drifting Mist Animation
+        gsap.to("#mistLayer", {
+            xPercent: 20,
+            duration: 20,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut"
+        });
+
+        // Intersection Observer for Materialization
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    gsap.to(entry.target, {
+                        opacity: 1,
+                        filter: "blur(0px)",
+                        y: 0,
+                        duration: 1.5,
+                        ease: "power4.out"
+                    });
+                }
+            });
+        }, { threshold: 0.15 });
+
+        document.querySelectorAll('.text-reveal').forEach(el => observer.observe(el));
+
+        // Background Color Shift for Chapter 4
+        gsap.to("body", {
+            scrollTrigger: {
+                trigger: ".bg-white",
+                start: "top center",
+                end: "bottom center",
+                toggleActions: "play reverse play reverse",
+                onEnter: () => gsap.to("body", {backgroundColor: "#ffffff", duration: 1, ease: "power2.inOut"}),
+                onLeave: () => gsap.to("body", {backgroundColor: "#020202", duration: 1, ease: "power2.inOut"}),
+                onEnterBack: () => gsap.to("body", {backgroundColor: "#ffffff", duration: 1, ease: "power2.inOut"}),
+                onLeaveBack: () => gsap.to("body", {backgroundColor: "#020202", duration: 1, ease: "power2.inOut"})
+            }
+        });
+    </script>
+</body>
+</html>
